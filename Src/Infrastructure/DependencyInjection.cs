@@ -60,7 +60,45 @@ namespace Northwind.Infrastructure
             else
             {
                 services.AddIdentityServer()
-                    .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
+                    .AddApiAuthorization<ApplicationUser, ApplicationDbContext>(options =>
+                    {
+                        options.Clients.Add(
+                            // new Client
+                            //     {
+                            //         AllowOfflineAccess = true,
+                            //         AllowedScopes = {"openid", "profile", "testapi"},
+                            //         RedirectUris = {"https://www.getpostman.com/oauth2/callback"},
+                            //         Enabled = true,
+                            //         ClientId = "832afa32-cabe-40a0-8909-2241cd85e47d.Local.apps",
+                            //         ClientSecrets = {new Secret{Value = "NotASecret".Sha512()}},
+                            //         ClientName = "PostMan Login",
+                            //         PostLogoutRedirectUris = {"http://localhost:5002/signout-callback-oidc"},
+                            //         ClientUri = null,
+                            //         AllowedGrantTypes = {GrantTypes.Code},
+                            //         AllowAccessTokensViaBrowser = true,
+                            //         LogoUri = null
+                            //     });
+                            new Client
+                            {
+                                ClientId = "postman-api",
+                                ClientName = "Postman Test Client",
+                                AllowedGrantTypes = GrantTypes.Code,
+                                AllowAccessTokensViaBrowser = true,
+                                RequireConsent = false,
+                                RedirectUris = {"https://www.getpostman.com/oauth2/callback"},
+                                PostLogoutRedirectUris =  {"https://www.getpostman.com"},
+                                AllowedCorsOrigins = {"https://www.getpostman.com"},
+                                EnableLocalLogin = true,
+                                AllowedScopes = 
+                                {
+                                    IdentityServer4.IdentityServerConstants.StandardScopes.OpenId,
+                                    IdentityServer4.IdentityServerConstants.StandardScopes.Profile,
+                                    IdentityServer4.IdentityServerConstants.StandardScopes.Email,
+                                    "postman_api"
+                                },
+                                ClientSecrets = new List<Secret>() { new Secret("SomeValue".Sha512())}
+                            });
+                    });
             }
 
             services.AddAuthentication()
